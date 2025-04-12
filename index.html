@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nadim Chat</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        #chat-box {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+        }
+
+        #chat-box .message {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .me {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .other {
+            background-color: #f1f0f0;
+            text-align: left;
+        }
+
+        #input-box {
+            width: 100%;
+            max-width: 600px;
+            margin: 10px auto 0;
+            display: flex;
+        }
+
+        #message {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        #send {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #send:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Nadim WebSocket Chat</h2>
+
+    <div id="chat-box"></div>
+
+    <div id="input-box">
+        <input type="text" id="message" placeholder="Type your message..." />
+        <button id="send">Send</button>
+    </div>
+
+    <script>
+        var conn = new WebSocket('ws://192.168.1.32:8080');
+
+        conn.onopen = function(e) {
+            console.log("Connection established!");
+        };
+
+        conn.onmessage = function(e) {
+            let data = e.data;
+            $('#chat-box').append('<div class="message other">' + data + '</div>');
+            $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+        };
+
+        $('#send').click(function() {
+            let msg = $('#message').val();
+            if (msg !== '') {
+                conn.send(msg);
+                $('#chat-box').append('<div class="message me">' + msg + '</div>');
+                $('#message').val('');
+                $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+            }
+        });
+
+        // Optional: Send on Enter key
+        $('#message').keypress(function(e) {
+            if (e.which === 13) {
+                $('#send').click();
+            }
+        });
+    </script>
+
+</body>
+</html>
